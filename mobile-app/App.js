@@ -13,43 +13,61 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
+  Button,
   useColorScheme,
   View,
 } from 'react-native';
 
+import { authorize, logout } from 'react-native-app-auth';
+
 import {
   Colors,
-  DebugInstructions,
   Header,
-  LearnMoreLinks,
-  ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+const ISSUER = "https://10.0.2.2:8443/realms/pier-stage";
+
+let authState = null;
+
+const makeLogin = async () => {
+  // base config
+  const config = {
+    issuer: ISSUER,
+    clientId: 'mobile_app',
+    redirectUrl: 'com.mobileapp.auth:/oauth2redirect',
+    scopes: ['openid', 'email', 'profile', 'offline_access'],
+    usePKCE: true,
+  };
+
+  // use the client to make the auth request and receive the authState
+  try {
+    authState = await authorize(config);
+    
+    // result includes accessToken, accessTokenExpirationDate and refreshToken
+    console.log(authState);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const makeLogout = async () => {
+  if (authState == null)
+    return;
+    
+  const config = {
+    issuer: ISSUER,
+  };
+
+  try {  
+    const result = await logout(config, {
+      idToken: authState.idToken,
+      postLogoutRedirectUrl: 'com.mobileapp.auth:/oauth2redirect',
+    });
+
+    authState = null;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const App: () => Node = () => {
@@ -70,20 +88,17 @@ const App: () => Node = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+          <Button
+            onPress={() => makeLogin()}
+            title="Login"
+            color="#841584"
+          />
+
+          <Button
+            onPress={() => makeLogout()}
+            title="Logout"
+            color="#6ACCBC"
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
