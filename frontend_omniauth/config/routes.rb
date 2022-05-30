@@ -3,11 +3,25 @@ Rails.application.routes.draw do
 
   resource :profile, only: [:show]
 
-  get "auth/:provider/callback", to: "sessions#create"
-  get "/logout/callback", to: "sessions#destroy"
-
+  get "/auth/:provider/callback", to: "sessions#create"
+  get "/auth/failure" => "sessions#failure"
+  
   get "/login", to: "sessions#new"
   get "/logout", to: "sessions#provider_logout"
+  get "/logout/callback", to: "sessions#destroy"
 
   root "profiles#show"
+
+  namespace :admin do
+    resource :profile, only: [:show]
+
+    get "/auth/:provider/callback", to: "sessions#create"
+    get "/auth/failure" => "sessions#failure"
+
+    get "/login", to: "sessions#new"
+    get "/logout", to: "sessions#provider_logout"
+    get "/logout/callback", to: "sessions#destroy"
+
+    root "profiles#show"
+  end
 end

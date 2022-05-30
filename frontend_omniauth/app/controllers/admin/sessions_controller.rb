@@ -1,26 +1,26 @@
-class SessionsController < ApplicationController
-  skip_before_action :authenticate_user!
+class Admin::SessionsController < ApplicationAdminController
+  skip_before_action :authenticate_admin!
 
   def new
-    redirect_post "/auth/member-stage", options: {authenticity_token: :auto}
+    redirect_post "/admin/auth/internal-stage", options: {authenticity_token: :auto}
   end
 
   def create
     auth = request.env['omniauth.auth']
 
     reset_session
-    session[:user_info] = auth.info
+    session[:admin_info] = auth.info
 
     cookies.permanent[:access_token] = auth.credentials.token
     cookies.permanent[:id_token] = auth.credentials.id_token
 
-    redirect_to profile_path
+    redirect_to admin_profile_path
   end
 
   def provider_logout
     # Add id token hint to omit the confirmation (in Keycloak) and do automatic redirect to the application
     # Based on OpenID Connect RP-Initiated Logout specification
-    redirect_to "/auth/member-stage/logout?id_token_hint=#{cookies.permanent[:id_token]}", allow_other_host: true
+    redirect_to "/admin/auth/internal-stage/logout?id_token_hint=#{cookies.permanent[:id_token]}", allow_other_host: true
   end
 
   def destroy
@@ -29,10 +29,10 @@ class SessionsController < ApplicationController
     
     reset_session
 
-    redirect_to root_path
+    redirect_to admin_root_path
   end
 
   def failure
-    redirect_to root_url, :alert => "Authentication error: #{params[:message].humanize}"
+    redirect_to admin_root_url, :alert => "Authentication error: #{params[:message].humanize}"
   end
 end

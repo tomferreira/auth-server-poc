@@ -1,0 +1,14 @@
+
+<div>
+    <p>User info (admin)</p>
+    <p><%= @admin_info %></p>
+</div>
+
+<div>
+    <p>Access token</p>
+    <p><%= @access_token %></p>
+</div>
+
+<%= form_tag(admin_logout_path, method: 'get', data: {turbo: false}) do %>
+  <button type='submit'>Logout</button>
+<% end %>
