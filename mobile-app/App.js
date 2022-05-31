@@ -6,9 +6,10 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type {Node} from 'react';
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -16,58 +17,32 @@ import {
   Button,
   useColorScheme,
   View,
+  Text,
 } from 'react-native';
 
-import { authorize, logout } from 'react-native-app-auth';
+import { prefetchConfiguration, authorize, refresh, logout } from 'react-native-app-auth';
 
 import {
   Colors,
   Header,
 } from 'react-native/Libraries/NewAppScreen';
 
-const ISSUER = "https://10.0.2.2:8443/realms/pier-stage";
+const ISSUER = "https://10.0.2.2:8443/realms/member-stage";
 
-let authState = null;
-
-const makeLogin = async () => {
-  // base config
-  const config = {
-    issuer: ISSUER,
-    clientId: 'mobile_app',
-    redirectUrl: 'com.mobileapp.auth:/oauth2redirect',
-    scopes: ['openid', 'email', 'profile', 'offline_access'],
-    usePKCE: true,
-  };
-
-  // use the client to make the auth request and receive the authState
-  try {
-    authState = await authorize(config);
-    
-    // result includes accessToken, accessTokenExpirationDate and refreshToken
-    console.log(authState);
-  } catch (error) {
-    console.log(error);
-  }
+const defaultAuthState = {
+  accessToken: '',
+  accessTokenExpirationDate: '',
+  refreshToken: '',
+  idToken: ''
 };
 
-const makeLogout = async () => {
-  if (authState == null)
-    return;
-    
-  const config = {
-    issuer: ISSUER,
-  };
-
-  try {  
-    const result = await logout(config, {
-      idToken: authState.idToken,
-      postLogoutRedirectUrl: 'com.mobileapp.auth:/oauth2redirect',
-    });
-
-    authState = null;
-  } catch (error) {
-    console.log(error);
-  }
+// base config
+const config = {
+  issuer: ISSUER,
+  clientId: 'mobile_app',
+  redirectUrl: 'com.mobileapp.auth:/oauth2redirect',
+  scopes: ['openid', 'email', 'profile', 'offline_access'],
+  usePKCE: true,
 };
 
 const App: () => Node = () => {
@@ -77,6 +52,67 @@ const App: () => Node = () => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const [authState, setAuthState] = useState(defaultAuthState);
+  
+  useEffect(() => {
+    prefetchConfiguration({
+      warmAndPrefetchChrome: true,
+      connectionTimeoutSeconds: 5,
+      ...config,
+    });
+  }, []);
+
+  const makeLogin = async () => {
+    // use the client to make the auth request and receive the authState
+    try {
+      const newAuthState = await authorize(config);
+      
+      setAuthState(newAuthState);
+    } catch (error) {
+      if (error.message == 'User cancelled flow') return;
+
+      Alert.alert('Failed to log in', error.message);
+    }
+  };
+
+  const makeRefresh = async () => {
+    try {
+      const newAuthState = await refresh(config, {
+        refreshToken: authState.refreshToken
+      });
+
+      setAuthState(current => ({
+        ...current,
+        ...newAuthState,
+        refreshToken: newAuthState.refreshToken || current.refreshToken
+      }));
+
+    } catch (error) {
+      Alert.alert('Failed to refresh token', error.message);
+    }
+  };
+  
+  const makeLogout = async () => {
+    if (authState == null)
+      return;
+
+    try {  
+      await logout({ issuer: ISSUER }, {
+        idToken: authState.idToken,
+        postLogoutRedirectUrl: 'com.mobileapp.auth:/oauth2redirect',
+      });
+  
+      setAuthState({
+        accessToken: '',
+        accessTokenExpirationDate: '',
+        refreshToken: '',
+        idToken: ''
+      });
+    } catch (error) {
+      Alert.alert('Failed to logout', error.message);
+    }
+  };
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -84,22 +120,38 @@ const App: () => Node = () => {
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Button
-            onPress={() => makeLogin()}
-            title="Login"
-            color="#841584"
-          />
 
-          <Button
-            onPress={() => makeLogout()}
-            title="Logout"
-            color="#6ACCBC"
-          />
-        </View>
+
+          {!!authState.accessToken ? (
+            <View>
+              <Text>accessToken</Text>
+              <Text>{authState.accessToken}</Text>
+              <Text>accessTokenExpirationDate</Text>
+              <Text>{authState.accessTokenExpirationDate}</Text>
+              <Text>refreshToken</Text>
+              <Text>{authState.refreshToken}</Text>
+              <Text>scopes</Text>
+              <Text>{authState.scopes.join(', ')}</Text>
+            </View>
+          ) : null}
+
+          <View>
+            {!authState.accessToken ? (
+              <>
+                <Button
+                  onPress={() => makeLogin()}
+                  title="Login"
+                  color="#DA2536"
+                />
+              </>
+            ) : (
+              <Button onPress={() => makeLogout()} title="Logout" color="#EF525B" />
+            )}
+            {!!authState.refreshToken ? (
+              <Button onPress={() => makeRefresh()} title="Refresh" color="#24C2CB" />
+            ) : null}
+          </View>
+
       </ScrollView>
     </SafeAreaView>
   );
