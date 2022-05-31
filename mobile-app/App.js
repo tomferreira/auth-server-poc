@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 
 import { prefetchConfiguration, authorize, refresh, logout } from 'react-native-app-auth';
+import * as Keychain from 'react-native-keychain';
 
 import {
   Colors,
@@ -33,7 +34,8 @@ const defaultAuthState = {
   accessToken: '',
   accessTokenExpirationDate: '',
   refreshToken: '',
-  idToken: ''
+  idToken: '',
+  scopes: []
 };
 
 // base config
@@ -53,8 +55,10 @@ const App: () => Node = () => {
   };
 
   const [authState, setAuthState] = useState(defaultAuthState);
-  
-  useEffect(() => {
+
+  useEffect(async () => {
+    await restoreSecureAuthState();
+
     prefetchConfiguration({
       warmAndPrefetchChrome: true,
       connectionTimeoutSeconds: 5,
@@ -62,12 +66,31 @@ const App: () => Node = () => {
     });
   }, []);
 
+  const setSecureAuthState = (authState) => {
+    setAuthState(authState);
+    return Keychain.setGenericPassword('authState', JSON.stringify(authState));
+  };
+
+  const restoreSecureAuthState = async () => {
+    const credentials = await Keychain.getGenericPassword();
+    if (credentials)
+      setAuthState(JSON.parse(credentials.password));
+  };
+
+  const resetSecureAuthState = () => {
+    setAuthState(defaultAuthState);
+    return Keychain.resetGenericPassword();
+  };
+
   const makeLogin = async () => {
     // use the client to make the auth request and receive the authState
     try {
       const newAuthState = await authorize(config);
       
-      setAuthState(newAuthState);
+      const result = await setSecureAuthState(newAuthState);
+      
+      if (!result) 
+        throw Error('Unable to use secure storage!');
     } catch (error) {
       if (error.message == 'User cancelled flow') return;
 
@@ -81,12 +104,13 @@ const App: () => Node = () => {
         refreshToken: authState.refreshToken
       });
 
-      setAuthState(current => ({
-        ...current,
-        ...newAuthState,
-        refreshToken: newAuthState.refreshToken || current.refreshToken
-      }));
+      const result = await setSecureAuthState({
+        ...authState,
+        ...newAuthState
+      });
 
+      if (!result) 
+        throw Error('Unable to use secure storage!');
     } catch (error) {
       Alert.alert('Failed to refresh token', error.message);
     }
@@ -101,13 +125,8 @@ const App: () => Node = () => {
         idToken: authState.idToken,
         postLogoutRedirectUrl: 'com.mobileapp.auth:/oauth2redirect',
       });
-  
-      setAuthState({
-        accessToken: '',
-        accessTokenExpirationDate: '',
-        refreshToken: '',
-        idToken: ''
-      });
+
+      await resetSecureAuthState();
     } catch (error) {
       Alert.alert('Failed to logout', error.message);
     }
