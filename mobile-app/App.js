@@ -12,10 +12,7 @@ import {
   Alert,
   SafeAreaView,
   ScrollView,
-  StatusBar,
-  StyleSheet,
   Button,
-  useColorScheme,
   View,
   Text,
 } from 'react-native';
@@ -24,7 +21,6 @@ import { prefetchConfiguration, authorize, refresh, logout } from 'react-native-
 import * as Keychain from 'react-native-keychain';
 
 import {
-  Colors,
   Header,
 } from 'react-native/Libraries/NewAppScreen';
 
@@ -45,15 +41,10 @@ const config = {
   redirectUrl: 'com.mobileapp.auth:/oauth2redirect',
   scopes: ['openid', 'email', 'profile', 'offline_access'],
   usePKCE: true,
+  dangerouslyAllowInsecureHttpRequests: __DEV__,
 };
 
 const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   const [authState, setAuthState] = useState(defaultAuthState);
 
   useEffect(async () => {
@@ -133,14 +124,10 @@ const App: () => Node = () => {
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+    <SafeAreaView>
       <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
+        contentInsetAdjustmentBehavior="automatic">
         <Header />
-
-
           {!!authState.accessToken ? (
             <View>
               <Text>accessToken</Text>
@@ -175,24 +162,5 @@ const App: () => Node = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
