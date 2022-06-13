@@ -1,5 +1,5 @@
 {
-  "name": "MobileApp",
+  "name": "mobile-app",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
   "dependencies": {
     "react": "17.0.2",
     "react-native": "0.65.1",
-    "react-native-app-auth": "^6.4.3",
+    "react-native-app-auth": "https://github.com/FormidableLabs/react-native-app-auth.git",
     "react-native-keychain": "^8.0.0"
   },
   "devDependencies": {
