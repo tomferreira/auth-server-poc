@@ -15,5 +15,8 @@ docker-compose up
 # Misc
 
 ```
+adb reverse tcp:8443 tcp:8443
+adb push certs/localhost.crt /storage/emulated/0/Download
+adb logcat *:E
 keytool -list -v -keystore android/app/debug.keystore -alias androiddebugkey -storepass android -keypass android
 ```
