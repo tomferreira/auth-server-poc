@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "jwt-decode": "^3.1.2",
     "react": "17.0.2",
     "react-native": "0.65.1",
     "react-native-app-auth": "https://github.com/FormidableLabs/react-native-app-auth.git",

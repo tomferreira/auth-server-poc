@@ -4205,6 +4205,11 @@ jsonify@~0.0.0:
     array-includes "^3.1.4"
     object.assign "^4.1.2"
 
+jwt-decode@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-3.1.2.tgz#3fb319f3675a2df0c2895c8f5e9fa4b67b04ed59"
+  integrity sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==
+
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.2.2.tgz#31ea21a734bab9bbb0f32466d893aea51e4a3c64"
@@ -5308,7 +5313,7 @@ react-is@^17.0.1, react-is@^17.0.2:
 
 "react-native-app-auth@https://github.com/FormidableLabs/react-native-app-auth.git":
   version "6.4.3"
-  resolved "https://github.com/FormidableLabs/react-native-app-auth.git#5c7454700fc3e628f55a9c4487d6b2d8ee17c8dc"
+  resolved "https://github.com/FormidableLabs/react-native-app-auth.git#258cb6de08efa1093cb82a3250a9fdc426880651"
   dependencies:
     invariant "2.2.4"
     react-native-base64 "0.0.2"

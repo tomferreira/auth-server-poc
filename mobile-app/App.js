@@ -17,6 +17,7 @@ import {
   Text,
 } from 'react-native';
 
+import jwt_decode from 'jwt-decode';
 import { prefetchConfiguration, authorize, refresh, logout } from 'react-native-app-auth';
 import * as Keychain from 'react-native-keychain';
 
@@ -31,6 +32,7 @@ const defaultAuthState = {
   accessTokenExpirationDate: '',
   refreshToken: '',
   idToken: '',
+  decodedIdToken: {},
   scopes: []
 };
 
@@ -77,6 +79,7 @@ const App: () => Node = () => {
     // use the client to make the auth request and receive the authState
     try {
       const newAuthState = await authorize(config);
+      newAuthState.decodedIdToken = jwt_decode(newAuthState.idToken);
       
       const result = await setSecureAuthState(newAuthState);
       
@@ -94,6 +97,7 @@ const App: () => Node = () => {
       const newAuthState = await refresh(config, {
         refreshToken: authState.refreshToken
       });
+      newAuthState.decodedIdToken = jwt_decode(newAuthState.idToken);
 
       const result = await setSecureAuthState({
         ...authState,
@@ -130,6 +134,8 @@ const App: () => Node = () => {
         <Header />
           {!!authState.accessToken ? (
             <View>
+              <Text>idToken (decoded)</Text>
+              <Text>{JSON.stringify(authState.decodedIdToken)}</Text>
               <Text>accessToken</Text>
               <Text>{authState.accessToken}</Text>
               <Text>accessTokenExpirationDate</Text>
