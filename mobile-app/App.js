@@ -24,7 +24,7 @@ import {
   Header,
 } from 'react-native/Libraries/NewAppScreen';
 
-const ISSUER = "https://10.0.2.2:8443/realms/member-stage";
+const ISSUER = "https://10.0.2.2:8443/auth/realms/member-stage";
 
 const defaultAuthState = {
   accessToken: '',
@@ -34,7 +34,7 @@ const defaultAuthState = {
   scopes: []
 };
 
-// base config
+// Base config
 const config = {
   issuer: ISSUER,
   clientId: 'mobile_app',
