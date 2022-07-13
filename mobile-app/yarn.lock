@@ -5311,9 +5311,9 @@ react-is@^17.0.1, react-is@^17.0.2:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-"react-native-app-auth@https://github.com/FormidableLabs/react-native-app-auth.git":
+"react-native-app-auth@https://github.com/tomferreira/react-native-app-auth.git":
   version "6.4.3"
-  resolved "https://github.com/FormidableLabs/react-native-app-auth.git#258cb6de08efa1093cb82a3250a9fdc426880651"
+  resolved "https://github.com/tomferreira/react-native-app-auth.git#f97d6ace0c1d4c23b2b25b6d6321a0dce0929121"
   dependencies:
     invariant "2.2.4"
     react-native-base64 "0.0.2"

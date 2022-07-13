@@ -44,6 +44,7 @@ const config = {
   scopes: ['openid', 'email', 'profile', 'offline_access'],
   usePKCE: true,
   dangerouslyAllowInsecureHttpRequests: __DEV__,
+  additionalParameters: { "prompt": "login" }
 };
 
 const App: () => Node = () => {
