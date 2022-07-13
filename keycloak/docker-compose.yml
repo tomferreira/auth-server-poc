@@ -10,6 +10,8 @@ services:
       KEYCLOAK_HOSTNAME: localhost
       KEYCLOAK_FRONTEND_URL: "https://localhost:8443/auth/"
       PROXY_ADDRESS_FORWARDING: 'true'
+    volumes:
+      - ${PWD}/apple-social-identity-provider-1.0.2.jar:/opt/jboss/keycloak/standalone/deployments/apple-social-identity-provider-1.0.2.jar
 
   reverse-proxy:
     image: nginx:latest
