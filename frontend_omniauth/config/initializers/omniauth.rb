@@ -3,7 +3,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   provider :openid_connect, {
     name: :"internal-stage",
     path_prefix: "/admin/auth",
-    issuer: "https://localhost:8443/realms/internal-stage",
+    issuer: "https://localhost:8443/auth/realms/internal-stage",
     discovery: true,
     scope: [:openid, :email, :profile, :offline_access, :roles],
     response_type: :code,
@@ -21,7 +21,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   provider :openid_connect, {
     name: :"member-stage",
     path_prefix: "/auth",
-    issuer: "https://localhost:8443/realms/member-stage",
+    issuer: "https://localhost:8443/auth/realms/member-stage",
     discovery: true,
     scope: [:openid, :email, :profile, :offline_access, :roles],
     response_type: :code,
