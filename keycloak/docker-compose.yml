@@ -12,6 +12,7 @@ services:
       PROXY_ADDRESS_FORWARDING: 'true'
     volumes:
       - ${PWD}/apple-social-identity-provider-1.0.2.jar:/opt/jboss/keycloak/standalone/deployments/apple-social-identity-provider-1.0.2.jar
+      - ${PWD}/keycloak-verify-email-by-code-v15.1.jar:/opt/jboss/keycloak/standalone/deployments/keycloak-verify-email-by-code-v15.1.jar
 
   reverse-proxy:
     image: nginx:latest
